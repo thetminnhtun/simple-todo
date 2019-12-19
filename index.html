@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue Todo</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .done {
+            text-decoration: line-through;
+            color: #9E9E9E;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <h3>{{ title }}</h3>
+        <input type="text" v-model="newItem" @keyup.enter="addItem">
+        <button @click="addItem" class="btn btn-add">Add Item</button>
+        <ul>
+            <li v-for="item in reversedItem" :class="{done: item.completed}">
+                {{ item.title }}
+                <button 
+                @click="toggleItem(item)" 
+                :class="item.completed ? 'btn btn-undo' : 'btn btn-done' ">
+                    {{ item.completed ? 'Undo' : 'Done' }}
+                </button>
+                <!-- <button @click="toggleItem(item)" v-else class="btn btn-done">Done</button> -->
+            </li>
+        </ul>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                title: 'Todo List',
+                newItem: '',
+                items: [],
+            },
+            methods: {
+                getItem() {
+                    axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5')
+                        .then(response => this.items = response.data)
+                },
+                addItem() {
+                    let newItem = {
+                        title: this.newItem,
+                        completed: false
+                    }
+                    this.items = [...this.items, newItem];
+                    this.newItem = ''
+                },
+                toggleItem(item) {
+                    item.completed = !item.completed
+                }
+            },
+            computed: {
+                reversedItem() {
+                    return this.items.slice(0).reverse();
+                }
+            },
+            created() {
+                this.getItem()
+            }
+        })
+
+    </script>
+</body>
+
+</html>
